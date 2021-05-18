@@ -2,3 +2,5 @@
 packages/
 WinFormsMSDependencyInjection/bin/
 WinFormsMSDependencyInjection/obj/
+WinFormsMSDependencyInjectionTests/bin/
+WinFormsMSDependencyInjectionTests/obj/
