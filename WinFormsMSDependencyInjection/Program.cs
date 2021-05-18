@@ -3,14 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
+using System.Linq;
 using System.Windows.Forms;
+using WinFormsMSDependencyInjection.utils;
 
 namespace WinFormsMSDependencyInjection
 {
-    public delegate IThing ThingFactory(string key);
-
     static class Program
     {
+        //https://docs.simpleinjector.org/en/latest/windowsformsintegration.html
+
         [STAThread]
         public static void Main(string[] args)
         {
@@ -41,16 +43,12 @@ namespace WinFormsMSDependencyInjection
 
                   // Bind the correct type based on the setting in the config file
                   if (section["Type"] == "ThingOne")
-                  {
                       services.AddSingleton<IThing, ThingOne>();
-                  }
                   else
-                  {
                       services.AddSingleton<IThing, ThingTwo>();
-                  }
 
-                  // Main form is bound to itself
-                  services.AddScoped<MainForm>();
+                  AutoRegisterWindowsForms(services);
+                  services.AddSingleton<IFormOpener, FormOpener>();
               });
 
             var host = builder.Build();
@@ -67,6 +65,17 @@ namespace WinFormsMSDependencyInjection
                 {
                     Console.WriteLine("Error occurred");
                 }
+            }
+        }
+
+        private static void AutoRegisterWindowsForms(IServiceCollection services)
+        {
+            var types = typeof(Program).Assembly.GetTypes().Where(t => t.BaseType == typeof(Form)).ToList();
+
+            foreach (var type in types)
+            {
+                services.AddTransient(type);
+
             }
         }
     }
